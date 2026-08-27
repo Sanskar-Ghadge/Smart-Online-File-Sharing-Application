@@ -1,0 +1,29 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files (only .env.example committed)
+.env
+!.env.example
+
+# Java
+backend-auth/target/
+backend-auth/*.jar
+backend-auth/*.war
+
+# Maven Wrapper (keep mvnw + .mvn, skip local Maven)
+!.mvn/wrapper/maven-wrapper.jar
+
+# Node
+backend-signalling/node_modules/
+backend-signalling/dist/
+
+# React
+frontend/node_modules/
+frontend/dist/
+frontend/build/

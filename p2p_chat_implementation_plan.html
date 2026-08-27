@@ -1,0 +1,623 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .wrap { padding: 1.5rem 0; }
+
+  .hero { margin-bottom: 2rem; }
+  .hero h1 { font-size: 20px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+  .hero p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 0.5px solid var(--border); margin-bottom: 1.5rem; }
+  .tab { font-size: 13px; padding: 8px 14px; border: none; background: none; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: var(--font-sans); transition: color .15s; border-radius: 6px 6px 0 0; }
+  .tab:hover { color: var(--text-primary); background: var(--surface-1); }
+  .tab.active { color: var(--text-accent); border-bottom-color: var(--border-accent); font-weight: 500; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Phase cards */
+  .phase { border: 0.5px solid var(--border); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
+  .phase-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--surface-1); cursor: pointer; user-select: none; }
+  .phase-header:hover { background: var(--surface-0); }
+  .phase-badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: var(--radius); }
+  .badge-1 { background: var(--bg-accent); color: var(--text-accent); }
+  .badge-2 { background: #E1F5EE; color: #0F6E56; }
+  .badge-3 { background: #FAEEDA; color: #854F0B; }
+  .badge-4 { background: #EEEDFE; color: #534AB7; }
+  .badge-5 { background: #FAECE7; color: #993C1D; }
+  .badge-6 { background: #EAF3DE; color: #3B6D11; }
+  .badge-7 { background: #E0F2FE; color: #0B6DA2; }
+  .badge-8 { background: #F3E8FF; color: #7E3AF2; }
+  .phase-title { font-size: 14px; font-weight: 500; color: var(--text-primary); flex: 1; }
+  .phase-tag { font-size: 11px; color: var(--text-muted); }
+  .chevron { font-size: 12px; color: var(--text-muted); transition: transform .2s; }
+  .phase.open .chevron { transform: rotate(180deg); }
+  .phase-body { display: none; padding: 0 16px 16px; border-top: 0.5px solid var(--border); }
+  .phase.open .phase-body { display: block; }
+
+  .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  .module { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+  .module-name { font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+  .module-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+  .task-list { margin-top: 12px; }
+  .task { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--border); }
+  .task:last-child { border-bottom: none; }
+  .task-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); margin-top: 5px; flex-shrink: 0; }
+  .task-text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .task-text strong { color: var(--text-primary); font-weight: 500; }
+
+  /* Stack tab */
+  .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .stack-card { background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 12px; padding: 14px; }
+  .stack-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+  .stack-items { display: flex; flex-direction: column; gap: 4px; }
+  .stack-item { font-size: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+  .stack-item i { font-size: 14px; color: var(--text-accent); }
+
+  /* Architecture tab */
+  .arch-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .arch-card { background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 12px; padding: 14px; }
+  .arch-card.full { grid-column: 1 / -1; }
+  .arch-title { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .arch-title i { font-size: 16px; color: var(--text-accent); }
+  .arch-point { font-size: 12px; color: var(--text-secondary); padding: 3px 0; line-height: 1.5; display: flex; gap: 6px; }
+  .arch-point::before { content: "→"; color: var(--text-muted); flex-shrink: 0; }
+
+  /* Security tab */
+  .sec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sec-card { background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 12px; padding: 14px; }
+  .sec-title { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .sec-title i { font-size: 16px; }
+  .sec-title.ok i { color: var(--text-success); }
+  .sec-title.warn i { color: var(--text-warning); }
+  .sec-point { font-size: 12px; color: var(--text-secondary); padding: 3px 0; line-height: 1.5; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 20px; }
+  .timeline::before { content: ""; position: absolute; left: 6px; top: 6px; bottom: 6px; width: 0.5px; background: var(--border-strong); }
+  .tl-item { position: relative; margin-bottom: 16px; }
+  .tl-dot { position: absolute; left: -17px; top: 4px; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--border-accent); background: var(--bg-accent); }
+  .tl-label { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+  .tl-title { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 3px; }
+  .tl-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+  .summary-row { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+  .stat { flex: 1; background: var(--surface-1); border: 0.5px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+  .stat-num { font-size: 22px; font-weight: 500; color: var(--text-primary); }
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Hardening callout boxes inside phases */
+  .hardening { margin-top: 12px; border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .hardening-header { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #FEF3F2; font-size: 12px; font-weight: 500; color: #B42318; }
+  .hardening-header i { font-size: 14px; }
+  .hardening-body { padding: 8px 12px; }
+  .hardening-item { font-size: 12px; color: var(--text-secondary); padding: 5px 0; line-height: 1.5; border-bottom: 0.5px solid var(--border); display: flex; gap: 8px; align-items: flex-start; }
+  .hardening-item:last-child { border-bottom: none; }
+  .hardening-tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+  .htag-new { background: #E1F5EE; color: #0F6E56; }
+  .htag-critical { background: #FEF3F2; color: #B42318; }
+  .htag-enhanced { background: #EEEDFE; color: #534AB7; }
+  .hardening-text strong { color: var(--text-primary); font-weight: 500; }
+</style>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Secure P2P Chat &amp; File Sharing — Implementation Plan</h1>
+    <p>Full project blueprint: 8 phases, derived from complete architectural analysis with 6 production-hardening recommendations integrated.</p>
+  </div>
+
+  <div class="summary-row">
+    <div class="stat"><div class="stat-num">8</div><div class="stat-label">Phases</div></div>
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">Core services</div></div>
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Hardening items</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">Quality loss on transfer</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('roadmap', this)">Roadmap</button>
+    <button class="tab" onclick="switchTab('stack', this)">Tech stack</button>
+    <button class="tab" onclick="switchTab('arch', this)">Architecture</button>
+    <button class="tab" onclick="switchTab('security', this)">Security</button>
+    <button class="tab" onclick="switchTab('timeline', this)">Timeline</button>
+  </div>
+
+  <!-- ROADMAP -->
+  <div id="roadmap" class="panel active">
+
+    <div class="phase open">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-badge badge-1">Phase 1</span>
+        <span class="phase-title">Project Setup, DB Schema &amp; Infrastructure</span>
+        <span class="phase-tag">Foundation — Detailed plan: phase1_implementation_plan.md</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="module-grid">
+          <div class="module"><div class="module-name">Docker Infrastructure</div><div class="module-desc"><code>docker-compose.yml</code> — MySQL 8.0 (port 3306) + Redis 7 (port 6379). Health checks on both containers. Named volume for MySQL persistence.</div></div>
+          <div class="module"><div class="module-name">MySQL Schema</div><div class="module-desc"><code>schema.sql</code> — <code>users</code> table: id (BIGINT AI), username (VARCHAR 50 UNIQUE), email (VARCHAR 100 UNIQUE), password_hash (VARCHAR 255), status (ENUM ONLINE/OFFLINE), created_at, updated_at. InnoDB, utf8mb4.</div></div>
+          <div class="module"><div class="module-name">Redis Key Schema</div><div class="module-desc"><code>online:users</code> (SET of user IDs) — written by Node.js, read by Spring Boot. <code>online:{userId}:meta</code> (HASH with 60s TTL) — socket metadata, refreshed on heartbeat.</div></div>
+          <div class="module"><div class="module-name">Spring Boot Scaffolding</div><div class="module-desc">Maven project (3.2.5), <code>application.yml</code> with env var substitution, JPA entity + repository for User, RedisConfig + RedisService, CorsConfig, SecurityConfig (permit-all for Phase 1), HealthController with <code>/infra/health</code>, <code>/infra/redis-check</code>, <code>/infra/db-check</code>.</div></div>
+          <div class="module"><div class="module-name">Node.js Scaffolding</div><div class="module-desc">Express + Socket.IO + Redis client. <code>app.js</code> with CORS, Socket.IO server (event handlers deferred to Phase 2+), <code>redisService.js</code> with setUserOnline/setUserOffline/refreshHeartbeat, <code>/health</code> route.</div></div>
+          <div class="module"><div class="module-name">React Scaffolding</div><div class="module-desc">Vite project, proxy config for <code>/api</code> → Spring Boot and <code>/socket.io</code> → Node.js. Phase 1 App.jsx is a status dashboard showing health JSONs from both backends + Socket.IO connection test.</div></div>
+          <div class="module"><div class="module-name">Git &amp; Config</div><div class="module-desc">Monorepo with 3 sub-projects. <code>.gitignore</code> excludes node_modules, target, .env, mysql_data. <code>.env.example</code> in every project. No hardcoded secrets in committed files.</div></div>
+        </div>
+        <div class="task-list">
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Step 1:</strong> <code>docker-compose up -d</code> → verify MySQL + Redis containers healthy</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Step 2:</strong> Git init + .gitignore + README + initial commit</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Step 3:</strong> Create Spring Boot project → write pom.xml, application.yml, schema.sql, all Java classes → <code>mvn spring-boot:run</code> → verify 3 health endpoints</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Step 4:</strong> Create Node.js project → <code>npm install</code> → write app.js, redis.js, redisService.js, health.js → <code>npm run dev</code> → verify <code>/health</code></div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Step 5:</strong> Create React project → <code>npm install</code> → write vite.config.js (proxy), App.jsx → <code>npm run dev</code> → verify status dashboard + Socket.IO + no CORS errors</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Step 6:</strong> Cross-Redis smoke test — Node.js writes <code>online:users</code> → Spring Boot reads via <code>/infra/redis-check</code> → count matches</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Step 7:</strong> Final git commit — "Phase 1 complete"</div></div>
+        </div>
+        <div class="hardening">
+          <div class="hardening-header"><i class="ti ti-check" aria-hidden="true"></i> Acceptance Criteria — ALL must pass before Phase 2</div>
+          <div class="hardening-body">
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Must</span>
+              <div class="hardening-text"><code>curl http://localhost:8080/infra/health</code> → <code>{"status":"UP"}</code></div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Must</span>
+              <div class="hardening-text"><code>curl http://localhost:8080/infra/redis-check</code> → <code>{"redis":"connected"}</code></div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Must</span>
+              <div class="hardening-text"><code>curl http://localhost:8080/infra/db-check</code> → <code>{"mysql":"connected"}</code></div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Must</span>
+              <div class="hardening-text"><code>curl http://localhost:3001/health</code> → <code>{"redis":"connected"}</code></div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Must</span>
+              <div class="hardening-text">React at <code>http://localhost:5173</code> shows both health JSONs + Socket.IO connected + zero CORS errors</div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Must</span>
+              <div class="hardening-text">Cross-Redis test: write via Node.js → read via Spring Boot → count matches</div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Must</span>
+              <div class="hardening-text">No hardcoded secrets in committed files — all via env vars + .env.example</div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Must</span>
+              <div class="hardening-text">All 5 services stay running idle for 2+ minutes without crashes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-badge badge-2">Phase 2</span>
+        <span class="phase-title">Authentication, User Management &amp; Online Status</span>
+        <span class="phase-tag">Auth &amp; Users</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="module-grid">
+          <div class="module"><div class="module-name">User Registration</div><div class="module-desc">Username, email, password. BCrypt hashing stored in MySQL. Input validation on all fields.</div></div>
+          <div class="module"><div class="module-name">Login &amp; JWT</div><div class="module-desc">Spring Boot validates credentials, issues JWT token. Token contains user ID + expiry. Spring Security filter chain.</div></div>
+          <div class="module"><div class="module-name">Online Status (Redis)</div><div class="module-desc">Node.js owns real-time online/offline state via Socket.IO connections. On connect → write to Redis. On disconnect → remove from Redis.</div></div>
+          <div class="module"><div class="module-name">User List API</div><div class="module-desc">Spring Boot <code>/users/online</code> endpoint queries Redis for currently online users. Returns list to React.</div></div>
+        </div>
+        <div class="task-list">
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Spring Boot:</strong> <code>/register</code> — validate input, BCrypt hash, save to MySQL, return success/error</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Spring Boot:</strong> <code>/login</code> — verify credentials, generate JWT, return token + user profile</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Spring Boot:</strong> <code>/users/online</code> — query Redis <code>online:users</code> set, join with MySQL for usernames</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Node.js:</strong> Socket.IO middleware — authenticate JWT on connection, write user ID to Redis on connect, remove on disconnect</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>React:</strong> Login page, Register page, Online users sidebar (polls <code>/users/online</code> or receives via Socket.IO event)</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Security:</strong> JWT middleware on all protected endpoints, HTTPS enforced, input sanitization</div></div>
+        </div>
+        <div class="hardening">
+          <div class="hardening-header"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Hardening Item #3 — Dual-Backend State Sync</div>
+          <div class="hardening-body">
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Critical</span>
+              <div class="hardening-text"><strong>Shared Redis store for online status:</strong> Node.js (Socket.IO) owns real-time connection events and writes online status to Redis. Spring Boot's <code>/users/online</code> endpoint reads from the same Redis key — no direct DB polling. This eliminates the state desync risk between the two backends.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-badge badge-3">Phase 3</span>
+        <span class="phase-title">P2P Connection Layer — Brokering, TCP, NAT &amp; TLS</span>
+        <span class="phase-tag">Core P2P</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="module-grid">
+          <div class="module"><div class="module-name">Connection Brokering</div><div class="module-desc">Spring Boot <code>/connect</code> endpoint — accepts peer A request, notifies peer B via Node.js, returns B's IP/Port to A. Then steps out.</div></div>
+          <div class="module"><div class="module-name">TCP Socket Layer</div><div class="module-desc">Java <code>P2PConnection</code> class — manages <code>ServerSocket</code> + <code>Socket</code> lifecycle on both ends. Desktop-app deployment model (local Java app per user).</div></div>
+          <div class="module"><div class="module-name">NAT Traversal (STUN)</div><div class="module-desc">STUN-based hole punching for peers behind routers/firewalls. Discover public IP + port mapping.</div></div>
+          <div class="module"><div class="module-name">TURN Relay Fallback</div><div class="module-desc">TURN relay server — if STUN fails (symmetric NAT), peers fall back to server-relayed TCP through TURN.</div></div>
+          <div class="module"><div class="module-name">TLS Cert Pinning</div><div class="module-desc">Server brokers exchange public key / self-signed cert fingerprints during negotiation. Peers pin fingerprints before TLS handshake.</div></div>
+        </div>
+        <div class="task-list">
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Spring Boot:</strong> <code>/connect</code> endpoint — peer A requests connection to B, server notifies B via Node.js signalling, returns B's address + cert fingerprint to A</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Node.js:</strong> WebSocket signalling events — <code>connection_request</code>, <code>connection_accept</code>, <code>connection_reject</code> between peers</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Java:</strong> <code>P2PConnection</code> class — opens <code>ServerSocket</code> on random port, connects to peer's socket, manages read/write streams</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>STUN:</strong> Integrate STUN client in Java — discover public IP/port, exchange via broker</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>TURN:</strong> Deploy TURN relay server (e.g., coturn). Java client attempts direct → STUN → TURN relay in that order</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>TLS:</strong> Generate self-signed certs per user. Broker exchanges fingerprints. <code>SSLContext</code> with pinned fingerprint verification in Java</div></div>
+        </div>
+        <div class="hardening">
+          <div class="hardening-header"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Hardening Items #1, #2, #4 — NAT Fallback, Deployment Model, TLS Pinning</div>
+          <div class="hardening-body">
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Critical</span>
+              <div class="hardening-text"><strong>#1 TURN relay fallback:</strong> STUN is designed for UDP NAT traversal; TCP hole punching is significantly harder and unreliable across symmetric NATs. Implement a TURN relay server as fallback from day 1 — if STUN-based TCP punching fails, peers fall back to server-relayed TCP through TURN.</div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Critical</span>
+              <div class="hardening-text"><strong>#2 Deployment model — confirmed:</strong> Browsers cannot open raw TCP sockets. The architecture requires each user to run a local Java application (Spring Boot) that serves the React UI locally and manages the P2P TCP socket layer. This is a desktop-style deployment model, not a pure browser app. If a pure browser app is needed, swap raw TCP for WebRTC DataChannels.</div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-new">New</span>
+              <div class="hardening-text"><strong>#4 TLS certificate pinning for P2P:</strong> Raw TLS between peers requires trust establishment. During connection negotiation (brokering phase), the server exchanges each peer's public key / self-signed cert fingerprint. Peers pin these fingerprints — TLS connection is only established if the remote cert matches the pinned fingerprint. Prevents MITM on the P2P channel.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-badge badge-4">Phase 4</span>
+        <span class="phase-title">1-to-1 Chat UI &amp; Message Protocol</span>
+        <span class="phase-tag">Chat</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="module-grid">
+          <div class="module"><div class="module-name">Message Protocol</div><div class="module-desc">Define message format over TCP: JSON header (type, sender, timestamp) + body. Types: TEXT, SYSTEM, FILE_REQUEST, FILE_RESPONSE.</div></div>
+          <div class="module"><div class="module-name">Chat Logic</div><div class="module-desc">Java reads from socket input stream, parses messages, emits events to React via WebSocket/REST callback. React sends messages to Java, which writes to socket output stream.</div></div>
+          <div class="module"><div class="module-name">Chat UI</div><div class="module-desc">React chat window — message bubbles (sent/received), timestamps, connection status indicator, typing indicator (optional).</div></div>
+          <div class="module"><div class="module-name">Reconnect Logic</div><div class="module-desc">Heartbeat ping/pong every 15s. On timeout, attempt reconnect. Show "Reconnecting…" state in UI.</div></div>
+        </div>
+        <div class="task-list">
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Protocol:</strong> <code>MSG_TYPE|SENDER_ID|TIMESTAMP|BODY</code> over TCP. Define <code>TEXT</code>, <code>SYSTEM</code>, <code>FILE_REQUEST</code>, <code>FILE_RESPONSE</code>, <code>HEARTBEAT</code> message types</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Java:</strong> <code>MessageReader</code> thread — reads from socket <code>InputStream</code>, parses, forwards to React via Node.js callback or direct WebSocket</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Java:</strong> <code>MessageWriter</code> — takes message from React (received via Node.js signalling), writes to socket <code>OutputStream</code></div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>React:</strong> Chat window component — message list, input box, send button, connection status badge, scroll-to-bottom on new message</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Heartbeat:</strong> Java sends ping every 15s, expects pong within 5s. On 3 missed pongs → mark disconnected, show reconnect button</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-badge badge-5">Phase 5</span>
+        <span class="phase-title">1-to-1 File Transfer, Chunking, Resume &amp; Checksum</span>
+        <span class="phase-tag">File Engine</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="module-grid">
+          <div class="module"><div class="module-name">File Chunking</div><div class="module-desc">Split file into 512KB chunks, each with sequence number. Sender reads file → chunks → sends over TCP.</div></div>
+          <div class="module"><div class="module-name">Progress Tracking</div><div class="module-desc">Receiver logs received chunk IDs to a <code>.part</code> metadata file on disk. Survives full app restart.</div></div>
+          <div class="module"><div class="module-name">Resume Protocol</div><div class="module-desc">On reconnect, receiver sends last chunk ID from <code>.part</code> file — sender resumes from next chunk.</div></div>
+          <div class="module"><div class="module-name">Checksum</div><div class="module-desc">SHA-256 hash of full file verified after last chunk. Bit-perfect guarantee.</div></div>
+          <div class="module"><div class="module-name">File Validation</div><div class="module-desc">Expanded blacklist check on sender side before transfer. MIME + extension + double-extension detection.</div></div>
+        </div>
+        <div class="task-list">
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Protocol:</strong> <code>FILE_REQUEST</code> → <code>ACCEPT/REJECT</code> → <code>CHUNK(n)</code> → <code>ACK(n)</code> → <code>FILE_COMPLETE</code> → <code>CHECKSUM_VERIFY</code></div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Sender Java:</strong> Read file as <code>FileInputStream</code>, split into 512KB byte arrays with sequence numbers, send over socket</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Receiver Java:</strong> Read chunks from socket, write to temp file, update <code>.part</code> metadata file with chunk bitmap, send <code>ACK(n)</code></div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Resume:</strong> On reconnect, receiver reads <code>.part</code> file → sends <code>RESUME_FROM(chunk_id)</code> → sender seeks to offset, resumes</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Checksum:</strong> Sender computes SHA-256 of full file, sends with <code>FILE_COMPLETE</code>. Receiver computes SHA-256 of received file, compares.</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Blacklist:</strong> Block <code>.exe .bat .sh .msi .vbs .cmd .scr .ps1 .com</code> by MIME + extension + double-extension check on sender side</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>React UI:</strong> File picker button, send file button, progress bar (chunk count / total), accept/reject dialog on receiver side, transfer complete notification</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>All file types:</strong> PDF, DOCX, images, video, audio, ZIP — raw binary, zero quality loss</div></div>
+        </div>
+        <div class="hardening">
+          <div class="hardening-header"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Hardening Items #5, #6 — File Blacklist, Resume Persistence</div>
+          <div class="hardening-body">
+            <div class="hardening-item">
+              <span class="hardening-tag htag-enhanced">Enhanced</span>
+              <div class="hardening-text"><strong>#5 Expanded file blacklist:</strong> Original list (.exe, .bat, .sh, .msi, .vbs, .cmd) can be bypassed via .scr, .com, .ps1, or double extensions (e.g., file.pdf.exe). Updated blacklist: <code>.exe .bat .sh .msi .vbs .cmd .scr .ps1 .com</code>. Also detect double extensions by scanning the full filename, not just the last segment. Consider an allowlist mode for higher-security deployments.</div>
+            </div>
+            <div class="hardening-item">
+              <span class="hardening-tag htag-critical">Critical</span>
+              <div class="hardening-text"><strong>#6 .part metadata file for resume persistence:</strong> Receiver writes a <code>&lt;filename&gt;.part</code> metadata file to disk containing: original filename, total chunks, received chunk bitmap, SHA-256 of partial data. On full app restart + reconnect, receiver reads this file and requests only missing chunks. If <code>.part</code> file is missing, transfer starts from scratch. On successful checksum verify, <code>.part</code> file is deleted.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-badge badge-6">Phase 6</span>
+        <span class="phase-title">Group Creation &amp; Invite System</span>
+        <span class="phase-tag">Group Layer</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="module-grid">
+          <div class="module"><div class="module-name">Group DB Schema</div><div class="module-desc"><code>groups(id, name, creator_id, created_at)</code>, <code>group_members(group_id, user_id, status)</code>. Server tracks active groups and members.</div></div>
+          <div class="module"><div class="module-name">Invite System</div><div class="module-desc">Creator selects online users → server sends invites via Node.js → each accepts/rejects in React UI.</div></div>
+          <div class="module"><div class="module-name">Member State</div><div class="module-desc">Server tracks which members are ready before allowing file transfer start. Status: PENDING → ACCEPTED/REJECTED.</div></div>
+        </div>
+        <div class="task-list">
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>DB:</strong> <code>groups(id, name, creator_id, created_at)</code>, <code>group_members(group_id, user_id, status, joined_at)</code></div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Spring Boot API:</strong> <code>/group/create</code>, <code>/group/invite</code>, <code>/group/accept</code>, <code>/group/reject</code>, <code>/group/members</code>, <code>/group/list</code></div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Node.js:</strong> Socket.IO event <code>group_invite</code> sent to invited users. <code>group_accept</code>/<code>group_reject</code> broadcast to group creator.</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>React:</strong> Group creation modal (name + select online users), invite list, pending invites notification banner, group list sidebar</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-badge badge-7">Phase 7</span>
+        <span class="phase-title">Group File Distribution (Server-Assisted)</span>
+        <span class="phase-tag">Distribution</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="module-grid">
+          <div class="module"><div class="module-name">Chunk Streaming</div><div class="module-desc">Sender → server → all members. Server streams chunks in memory, never stores to disk. Forward &amp; discard.</div></div>
+          <div class="module"><div class="module-name">Per-Member Tracking</div><div class="module-desc">Each member's chunk progress tracked independently on server. Dropouts can resume on rejoin.</div></div>
+          <div class="module"><div class="module-name">Partial Delivery</div><div class="module-desc">If one member drops, others continue receiving. Rejoined member resumes from last acknowledged chunk.</div></div>
+          <div class="module"><div class="module-name">Group Checksum</div><div class="module-desc">Each member verifies SHA-256 independently after receiving all chunks. Server reports per-member success.</div></div>
+        </div>
+        <div class="task-list">
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Flow:</strong> Sender sends chunk to server → server fans out to B, C, D simultaneously → collects ACKs per member → sends next chunk</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Server memory:</strong> Hold one chunk (512KB) at a time in memory buffer — forward to all members, collect ACKs, then discard. Never buffer full file.</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Resume:</strong> Server tracks <code>last_acked_chunk</code> per member. On rejoin, server resumes from <code>last_acked + 1</code> for that member only.</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Checksum:</strong> Sender computes SHA-256, sends with final chunk. Each member verifies independently. Server reports per-member pass/fail to sender.</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>React UI:</strong> Group file send button, per-member progress bars, member status icons (receiving/done/dropped/resuming), overall completion indicator</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-badge badge-8">Phase 8</span>
+        <span class="phase-title">Group Chat &amp; Final Integration</span>
+        <span class="phase-tag">Final</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="phase-body">
+        <div class="module-grid">
+          <div class="module"><div class="module-name">Broadcast Channel</div><div class="module-desc">Node.js Socket.IO rooms — each group is a room. Messages from any member reach all others in real-time.</div></div>
+          <div class="module"><div class="module-name">Message History</div><div class="module-desc">Store group messages in MySQL for session persistence. Load recent history on group open.</div></div>
+          <div class="module"><div class="module-name">Full Integration</div><div class="module-desc">Wire together: auth → online list → 1-to-1 chat → 1-to-1 files → groups → group files → group chat. End-to-end flow test.</div></div>
+        </div>
+        <div class="task-list">
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Node.js:</strong> Socket.IO rooms — <code>socket.join(group_id)</code>, <code>io.to(group_id).emit('message', data)</code>. Messages broadcast to all members in room.</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Optional DB:</strong> <code>messages(id, group_id, sender_id, content, timestamp)</code> — load last 50 messages on group open</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>React:</strong> Group chat window reuses 1-to-1 chat component (Phase 4) with multi-sender support — different avatar/color per sender</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Integration test:</strong> Full user journey — register → login → see online users → 1-to-1 chat → send file → create group → invite → group file share → group chat</div></div>
+          <div class="task"><div class="task-dot"></div><div class="task-text"><strong>Polish:</strong> Error handling, loading states, empty states, responsive layout, dark mode (optional)</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TECH STACK -->
+  <div id="stack" class="panel">
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-label">Frontend</div>
+        <div class="stack-items">
+          <div class="stack-item"><i class="ti ti-brand-react" aria-hidden="true"></i>React.js</div>
+          <div class="stack-item"><i class="ti ti-file-code" aria-hidden="true"></i>HTML5 / CSS3</div>
+          <div class="stack-item"><i class="ti ti-brand-javascript" aria-hidden="true"></i>JavaScript (ES6+)</div>
+          <div class="stack-item"><i class="ti ti-layout" aria-hidden="true"></i>Axios (HTTP client)</div>
+          <div class="stack-item"><i class="ti ti-plug" aria-hidden="true"></i>Socket.IO client</div>
+        </div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-label">Backend — Auth &amp; DB</div>
+        <div class="stack-items">
+          <div class="stack-item"><i class="ti ti-coffee" aria-hidden="true"></i>Spring Boot (Java)</div>
+          <div class="stack-item"><i class="ti ti-shield-lock" aria-hidden="true"></i>Spring Security + JWT</div>
+          <div class="stack-item"><i class="ti ti-database" aria-hidden="true"></i>Spring Data JPA</div>
+          <div class="stack-item"><i class="ti ti-database" aria-hidden="true"></i>MySQL</div>
+          <div class="stack-item"><i class="ti ti-tools" aria-hidden="true"></i>Maven</div>
+        </div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-label">Backend — Real-time</div>
+        <div class="stack-items">
+          <div class="stack-item"><i class="ti ti-brand-nodejs" aria-hidden="true"></i>Node.js</div>
+          <div class="stack-item"><i class="ti ti-server" aria-hidden="true"></i>Express.js</div>
+          <div class="stack-item"><i class="ti ti-plug-connected" aria-hidden="true"></i>Socket.IO (WebSocket)</div>
+          <div class="stack-item"><i class="ti ti-network" aria-hidden="true"></i>Signalling server</div>
+        </div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-label">Backend — Shared State</div>
+        <div class="stack-items">
+          <div class="stack-item"><i class="ti ti-database" aria-hidden="true"></i>Redis (online status store)</div>
+          <div class="stack-item"><i class="ti ti-refresh" aria-hidden="true"></i>Node.js writes, Spring Boot reads</div>
+          <div class="stack-item"><i class="ti ti-bolt" aria-hidden="true"></i>Eliminates dual-backend state desync</div>
+        </div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-label">Networking</div>
+        <div class="stack-items">
+          <div class="stack-item"><i class="ti ti-topology-star" aria-hidden="true"></i>TCP / Berkeley Sockets</div>
+          <div class="stack-item"><i class="ti ti-lock" aria-hidden="true"></i>TLS over TCP (P2P, cert pinning)</div>
+          <div class="stack-item"><i class="ti ti-world" aria-hidden="true"></i>HTTP/HTTPS (REST)</div>
+          <div class="stack-item"><i class="ti ti-router" aria-hidden="true"></i>STUN (NAT traversal)</div>
+          <div class="stack-item"><i class="ti ti-route" aria-hidden="true"></i>TURN relay (NAT fallback)</div>
+        </div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-label">Dev Tools</div>
+        <div class="stack-items">
+          <div class="stack-item"><i class="ti ti-brand-vscode" aria-hidden="true"></i>VS Code</div>
+          <div class="stack-item"><i class="ti ti-api" aria-hidden="true"></i>Postman</div>
+          <div class="stack-item"><i class="ti ti-table" aria-hidden="true"></i>MySQL Workbench</div>
+          <div class="stack-item"><i class="ti ti-git-branch" aria-hidden="true"></i>Git</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div id="arch" class="panel">
+    <div class="arch-row">
+      <div class="arch-card">
+        <div class="arch-title"><i class="ti ti-server" aria-hidden="true"></i>Central Server (Spring Boot)</div>
+        <div class="arch-point">Handles registration, login, JWT auth</div>
+        <div class="arch-point">Queries Redis for online user status (shared with Node.js)</div>
+        <div class="arch-point">Brokers P2P connection (IP/Port + cert fingerprint exchange)</div>
+        <div class="arch-point">Steps out after P2P is established</div>
+        <div class="arch-point">Re-enters only for group file distribution</div>
+      </div>
+      <div class="arch-card">
+        <div class="arch-title"><i class="ti ti-plug-connected" aria-hidden="true"></i>Signalling (Node.js)</div>
+        <div class="arch-point">WebSocket server for real-time events</div>
+        <div class="arch-point">Owns online status — writes to Redis on connect/disconnect</div>
+        <div class="arch-point">Sends connection request/accept notifications</div>
+        <div class="arch-point">Manages group chat rooms (Socket.IO)</div>
+        <div class="arch-point">Broadcasts group messages to all members</div>
+      </div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-card">
+        <div class="arch-title"><i class="ti ti-arrows-exchange" aria-hidden="true"></i>P2P Layer (TCP Sockets)</div>
+        <div class="arch-point">Direct Java TCP socket between two peers (desktop app model)</div>
+        <div class="arch-point">TLS encrypted with cert pinning — fingerprints exchanged via broker</div>
+        <div class="arch-point">Raw binary transfer — zero quality loss</div>
+        <div class="arch-point">Chunk protocol with ACK per chunk</div>
+        <div class="arch-point">SHA-256 checksum verification at end</div>
+        <div class="arch-point">TURN relay fallback when STUN fails (symmetric NAT)</div>
+      </div>
+      <div class="arch-card">
+        <div class="arch-title"><i class="ti ti-database" aria-hidden="true"></i>MySQL + Redis</div>
+        <div class="arch-point">MySQL: stores users, groups, group_members</div>
+        <div class="arch-point">MySQL: optional messages, transfer_history</div>
+        <div class="arch-point">MySQL: never stores actual files — metadata only</div>
+        <div class="arch-point">MySQL: BCrypt hashed passwords</div>
+        <div class="arch-point">Redis: shared online-status store between Spring Boot &amp; Node.js</div>
+      </div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-card full">
+        <div class="arch-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i>Known limitations &amp; mitigations</div>
+        <div class="arch-point"><strong>NAT/Firewall:</strong> Both users must have connectable IPs. Mitigation — STUN server for hole punching; TURN relay fallback if STUN fails (especially symmetric NAT).</div>
+        <div class="arch-point"><strong>Deployment model:</strong> Each user runs a local Java (Spring Boot) app that serves React UI and manages TCP sockets. Browsers alone cannot open raw TCP. Alternative: WebRTC DataChannels for pure-browser deployment.</div>
+        <div class="arch-point"><strong>TLS trust on P2P:</strong> Self-signed certs need trust establishment. Mitigation — server brokers exchange cert fingerprints during negotiation; peers pin them before TLS handshake.</div>
+        <div class="arch-point"><strong>Both online required:</strong> No offline messaging. Mitigation — optional message queue in DB for when user comes online.</div>
+        <div class="arch-point"><strong>Group server load:</strong> Server holds chunks in memory during group distribution. Mitigation — stream and discard each chunk immediately, never buffer full file.</div>
+        <div class="arch-point"><strong>Mobile P2P:</strong> TCP socket connections are harder to maintain on mobile networks. Mitigation — connection heartbeat + auto-reconnect logic.</div>
+        <div class="arch-point"><strong>Resume state loss:</strong> Local chunk progress lost on app restart. Mitigation — persist to <code>.part</code> metadata file on disk; survives restart; deleted on successful checksum.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div id="security" class="panel">
+    <div class="sec-grid">
+      <div class="sec-card">
+        <div class="sec-title ok"><i class="ti ti-shield-check" aria-hidden="true"></i>Authentication</div>
+        <div class="sec-point">BCrypt password hashing in MySQL</div>
+        <div class="sec-point">JWT tokens for session management</div>
+        <div class="sec-point">All REST APIs require valid JWT</div>
+        <div class="sec-point">HTTPS enforced on all server communication</div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-title ok"><i class="ti ti-shield-check" aria-hidden="true"></i>Transfer integrity</div>
+        <div class="sec-point">TCP handles packet ordering and retransmit</div>
+        <div class="sec-point">SHA-256 checksum verifies full file</div>
+        <div class="sec-point">Chunk sequence numbers detect missing data</div>
+        <div class="sec-point">TLS over TCP encrypts P2P stream</div>
+        <div class="sec-point">Cert pinning — fingerprints exchanged via broker, MITM prevented</div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-title ok"><i class="ti ti-shield-check" aria-hidden="true"></i>Access control</div>
+        <div class="sec-point">Receiver must accept before transfer begins</div>
+        <div class="sec-point">Users can reject or block senders</div>
+        <div class="sec-point">Only registered users can connect</div>
+        <div class="sec-point">Group access restricted to invited members</div>
+      </div>
+      <div class="sec-card">
+        <div class="sec-title warn"><i class="ti ti-alert-triangle" aria-hidden="true"></i>File type safety</div>
+        <div class="sec-point">Blacklist: .exe .bat .sh .msi .vbs .cmd .scr .ps1 .com</div>
+        <div class="sec-point">Detect double extensions (e.g., file.pdf.exe)</div>
+        <div class="sec-point">Check both file extension and MIME type</div>
+        <div class="sec-point">Validate on sender side before transfer starts</div>
+        <div class="sec-point">All other types: supported via raw binary TCP</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div id="timeline" class="panel">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 1 — Start here (~45 min)</div>
+        <div class="tl-title">Project setup, DB schema, Redis shared store, CORS, health checks</div>
+        <div class="tl-desc">Docker Compose for MySQL + Redis. Spring Boot with JPA entity, Redis config, CORS, and 3 health endpoints. Node.js with Express + Socket.IO + Redis service. React with Vite proxy and status dashboard. Cross-Redis smoke test. See phase1_implementation_plan.md for full step-by-step guide. Deliverable: all 5 services running, connected, verified.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 2 — After infrastructure is ready</div>
+        <div class="tl-title">Auth, user management, online status via Redis</div>
+        <div class="tl-desc">Build register/login/JWT on Spring Boot. Node.js writes online status to Redis, Spring Boot reads it. React has login, register, and online users list. Deliverable: users can register, log in, and see who's online.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 3 — Hardest phase, after 2 is stable</div>
+        <div class="tl-title">P2P connection layer — brokering, TCP, STUN/TURN, TLS pinning</div>
+        <div class="tl-desc">Spring Boot brokers connections. Java opens TCP sockets. STUN for NAT traversal, TURN relay fallback. TLS with cert pinning. Deliverable: two peers establish a direct encrypted TCP channel. No chat yet — just the pipe.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 4 — After P2P pipe works</div>
+        <div class="tl-title">1-to-1 chat UI &amp; message protocol</div>
+        <div class="tl-desc">Define message protocol over TCP. Build chat logic in Java (read/write streams) and chat UI in React. Add heartbeat reconnect. Deliverable: two users can send text messages to each other over the P2P channel.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 5 — After chat is rock solid</div>
+        <div class="tl-title">File transfer, chunking, resume, checksum, blacklist</div>
+        <div class="tl-desc">Add 512KB chunking protocol over the TCP channel. .part metadata file for resume persistence. SHA-256 checksum. Expanded file blacklist. Deliverable: any file type transfers bit-perfect and resumes on disconnect or app restart.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 6 — After 1-to-1 features complete</div>
+        <div class="tl-title">Group creation &amp; invite system</div>
+        <div class="tl-desc">New DB tables for groups + members. REST API for create/invite/accept/reject. Socket.IO events for real-time invites. React group UI. Deliverable: users can create groups and invite online peers who accept/reject.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 7 — After groups exist</div>
+        <div class="tl-title">Server-assisted group file distribution</div>
+        <div class="tl-desc">Server fans out chunks from sender to all members. Per-member tracking, partial delivery, resume on rejoin. SHA-256 per member. Deliverable: sender shares a file with all group members simultaneously with per-member resume.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-label">Phase 8 — Final</div>
+        <div class="tl-title">Group chat &amp; final integration</div>
+        <div class="tl-desc">Socket.IO rooms for group chat. Reuse 1-to-1 chat component with multi-sender. Optional message history in MySQL. Full end-to-end integration test. Deliverable: fully working app — register → chat → files → groups → group files → group chat.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(id, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+  function togglePhase(header) {
+    header.parentElement.classList.toggle('open');
+  }
+</script>
