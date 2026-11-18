@@ -1,0 +1,7 @@
+﻿.wrap{display:flex;flex-direction:column;gap:6px;}
+.row{display:flex;justify-content:space-between;align-items:baseline;}
+.name{font-size:0.875rem;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:75%;}
+.pct{font-size:0.875rem;font-weight:700;}
+.track{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden;}
+.fill{height:100%;border-radius:99px;}
+.meta{font-size:0.75rem;color:var(--text-secondary);}

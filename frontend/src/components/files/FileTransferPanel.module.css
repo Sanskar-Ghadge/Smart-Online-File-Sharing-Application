@@ -1,0 +1,7 @@
+﻿.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;margin:0 16px 8px;padding:1rem;box-shadow:var(--shadow-md);}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.title{font-size:0.9375rem;color:var(--text-primary);}
+.close{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:none;background:var(--surface-2);color:var(--text-secondary);cursor:pointer;transition:background 0.18s;}
+.close:hover{background:var(--danger-soft);color:var(--danger);}
+.progress{display:flex;flex-direction:column;gap:8px;}
+.done{font-size:0.8125rem;color:var(--green-dark);font-weight:600;}

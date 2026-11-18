@@ -1,0 +1,5 @@
+﻿.wrap{padding:1rem;}
+.header{display:flex;align-items:center;gap:6px;font-size:0.875rem;font-weight:600;color:var(--text-primary);margin-bottom:12px;}
+.list{display:flex;flex-direction:column;gap:16px;}
+.memberRow{display:flex;flex-direction:column;gap:6px;padding:12px;background:var(--surface-2);border-radius:10px;}
+.memberName{font-size:0.8125rem;font-weight:600;color:var(--text-secondary);}

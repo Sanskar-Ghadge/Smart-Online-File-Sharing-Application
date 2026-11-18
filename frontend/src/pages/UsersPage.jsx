@@ -1,0 +1,1 @@
+﻿import OnlineUserList from"../components/users/OnlineUserList";export default function UsersPage(){return<OnlineUserList/>;}

@@ -1,0 +1,14 @@
+.bar { height: var(--topbar-height,56px); background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem; flex-shrink: 0; z-index: 100; }
+.left { display: flex; align-items: center; gap: 8px; }
+.logo { color: var(--accent); }
+.appName { font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); }
+.divider { color: #C9CDD9; margin: 0 2px; }
+.title { font-size: 0.875rem; color: var(--text-secondary); }
+.right { display: flex; align-items: center; gap: 12px; }
+.connStatus { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 500; }
+.connected { background: var(--green-soft,#DCFCE7); color: var(--green-dark,#15803D); }
+.disconnected { background: var(--danger-soft,#FEE2E2); color: var(--danger-dark,#B91C1C); }
+.userArea { display: flex; align-items: center; gap: 8px; }
+.username { font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
+.logoutBtn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--surface-2); color: var(--text-secondary); cursor: pointer; transition: background 0.18s; }
+.logoutBtn:hover { background: var(--danger-soft); color: var(--danger); }

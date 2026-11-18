@@ -1,0 +1,10 @@
+.zone{border:2px dashed var(--border-strong);border-radius:16px;padding:2rem 1rem;cursor:pointer;transition:border-color 0.2s,background 0.2s;position:relative;text-align:center;}
+.zone:hover{border-color:var(--accent);background:var(--accent-soft);}
+.dragging{border-color:var(--accent);background:var(--accent-soft);}
+.hidden{display:none;}
+.inner{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.icon{color:#9CA3AF;}
+.iconAccent{color:var(--accent);}
+.hint{font-size:0.9375rem;font-weight:600;color:var(--text-primary);}
+.sub{font-size:0.8125rem;color:var(--text-secondary);}
+.error{color:var(--danger);font-size:0.8125rem;font-weight:500;margin-top:8px;}
